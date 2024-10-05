@@ -24,6 +24,8 @@
     "mysql2": "^3.11.3",
     "nodemon": "2.0.15",
     "npm": "^10.8.3",
+    "sequelize": "^6.37.4",
+    "sequelize-cli": "^6.6.2",
     "update-dotenv": "^1.1.1"
   }
 }

@@ -1,11 +1,10 @@
 require('dotenv').config()
 
 import express from "express"
-import conFigViewEngine from "./configs/viewEng";
+import conFigViewEngine from "./config/viewEng";
 import initWebRouters from "./routes/web";
 import bodyParser from "body-parser";
-
-
+// import connection from "./config/connectDB";
 const app = express();
 const PORT = process.env.PORT || 8080;
 //config view engine
@@ -17,9 +16,12 @@ conFigViewEngine(app);
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 
+
+//test connection
+// connection();
+
 //init web router
 initWebRouters(app)
-
 
 
 
