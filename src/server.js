@@ -1,14 +1,28 @@
-require('dotenv').config()
-
+require("dotenv").config()
 import express from "express"
 import conFigViewEngine from "./config/viewEng";
 import initWebRouters from "./routes/web";
+import initApiRouters from "./routes/api";
 import bodyParser from "body-parser";
+import cors from 'cors'
+
+
+
 // import connection from "./config/connectDB";
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+
 //config view engine
 conFigViewEngine(app);
+
+
+// Cấu hình CORS để chấp nhận yêu cầu từ localhost:3000
+app.use(cors({
+    origin: process.env.REACT_URL || 'http://localhost:3000'
+}));
+
+
 
 
 //config body-parser
@@ -22,7 +36,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 
 //init web router
 initWebRouters(app)
-
+initApiRouters(app)
 
 
 app.listen(PORT, ()=> {
