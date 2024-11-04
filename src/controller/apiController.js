@@ -30,12 +30,28 @@ const handleRegister = async (req, res) => {
         })
     } 
 }
-const handleLogin = (req, res) => {
-    console.log('data: ',req)
-    return res.status(200).json({
-        message: 'ok',
-        data: 'api login is got successfully'
-    })
+const handleLogin = async (req, res) => {
+    try{
+        if (!req.body.valueLogin && !req.body.valuePassword) {
+            return res.status(200).json({
+                EM: 'Please enter complete information',
+                EC: '1',
+                DT: ''
+            })
+        }
+        let data = await loginRegisterService.CheckLogin(req.body)
+            return res.status(200).json({
+                EM: data.EM,
+                EC: data.EC,
+                DT: data.DT
+            })
+    } catch{
+        return res.status(500).json({
+                EM: 'Error from server',
+                EC: '-1',
+                DT: ''
+        })    
+    }
 }
 
 module.exports = {

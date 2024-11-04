@@ -1,5 +1,7 @@
+const { Op } = require('sequelize');
 import bcrypt from 'bcrypt';
 import db from '../models/index'
+
 
 const salt = bcrypt.genSaltSync(10);
 const hashUserPassWord = (userPassWord) => {
@@ -79,6 +81,54 @@ const RegisterNewUser = async (rawUserData) =>{
     }
 }
 
+// Hàm kiểm tra mật khẩu
+const checkPassword = (inputPassword, hashPassWord) => {
+    return bcrypt.compareSync(inputPassword, hashPassWord);
+}
+
+// Hàm kiểm tra thông tin tài khoản người dùng, xử lý đăng nhập
+const CheckLogin = async (rawUserData) => {
+    try {
+        // Tìm kiếm người dùng theo email hoặc số điện thoại
+        let user = await db.User.findOne({
+            where: {
+                // email: rawUserData.valueLogin
+                [Op.or]: [
+                    { email: rawUserData.valueLogin },
+                    { phone: rawUserData.valueLogin }
+                ],
+            }
+        });
+
+        // Kiểm tra xem người dùng có tồn tại không
+        if (user) {
+            let isCorrectPassword = checkPassword(rawUserData.valuePassword, user.password);
+            if (isCorrectPassword) {
+                return {
+                    EM: `Login successfully`,
+                    EC: 0,
+                    DT: ''
+                };
+            }
+        }
+
+        
+        return {
+            EM: 'Email/Phone number or password is incorrect',
+            EC: 1,
+            DT: ''
+        };
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EM: 'Something went wrong in the service...',
+            EC: -2
+        };
+    }
+}
+
+
 module.exports = {
-    RegisterNewUser
+    RegisterNewUser, CheckLogin
 }
