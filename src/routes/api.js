@@ -1,6 +1,7 @@
 import  express  from "express";
 import apiController from '../controller/apiController'
 import apiUserController from '../controller/apiUserController'
+import apiPositionController from '../controller/apiPositionController'
 const router = express.Router();
 
 /**
@@ -22,7 +23,11 @@ const router = express.Router();
     router.delete("/user/delete",apiUserController.handleDeleteUser)
 
     
+    //api lấy dữ liệu của position table
+    router.get("/position/read", apiPositionController.readPosition)
+
     return app.use("/api/v1/", router);
+
 }
 
 export default initApiRouters;
