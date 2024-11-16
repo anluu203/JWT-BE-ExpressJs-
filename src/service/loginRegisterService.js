@@ -10,7 +10,7 @@ const hashUserPassWord = (userPassWord) => {
   }
 
 // this func checks if email already exist  
-const checkEmailExist = async (userEmail) =>{
+export const checkEmailExist = async (userEmail) =>{
     let user = await db.User.findOne({ 
         where: { 
             email:userEmail 
@@ -21,7 +21,7 @@ const checkEmailExist = async (userEmail) =>{
     return false    
 }
 
-const checkPhoneExist = async (userPhone) =>{
+export const checkPhoneExist = async (userPhone) =>{
     let user = await db.User.findOne({ 
         where: { 
             phone:userPhone

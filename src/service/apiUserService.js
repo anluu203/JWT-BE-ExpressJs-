@@ -1,18 +1,13 @@
 import bcrypt from "bcrypt";
 import db from "../models/index";
-import { where } from "sequelize";
+// import { checkEmailExist } from "./loginRegisterService";
+// import { checkPhoneExist } from "./loginRegisterService";
 
-// mã hóa password
-// const salt = bcrypt.genSaltSync(10);
-// const hashPassWord = (userPassWord) => {
-//   let hashPassWordCheck = bcrypt.hashSync(userPassWord, salt);
-//   return hashPassWordCheck;
-// };
 
 const getAllUser = async () =>{
     try {
         let users = await db.User.findAll({
-            attributes: ["id", "email", "username", "sex", "phone"],
+            attributes: ["id", "email", "username", "sex", "phone", "address"],
             include:{model: db.position, attributes:["name","description"]}
         })
         if (users) {
@@ -37,13 +32,14 @@ const getAllUser = async () =>{
         }
     }
 }
+
 const getUserWithPagination = async (page, results) =>{
     try {
         let offset = (page - 1) * results; // offset là vị trí page đang hiển thị DL
         let { count, rows } = await db.User.findAndCountAll({
             offset: offset,
             limit: results,
-            attributes: ["id", "email", "username", "sex", "phone"],
+            attributes: ["id", "email", "username", "sex", "phone", "address"],
             include:{model: db.position, attributes:["name","description"]}
           });
         
@@ -73,9 +69,76 @@ const getUserWithPagination = async (page, results) =>{
     }
 }
 
+
+// mã hóa password
+const salt = bcrypt.genSaltSync(10);
+const hashUserPassWord = (userPassWord) => {
+  let hashPassWordCheck = bcrypt.hashSync(userPassWord, salt);
+  return hashPassWordCheck;
+};
+// this func checks if email already exist  
+ const checkEmailExist = async (userEmail) =>{
+    let user = await db.User.findOne({ 
+        where: { 
+            email:userEmail 
+        } });
+    if (user) {
+        return true
+    }
+    return false    
+}
+
+ const checkPhoneExist = async (userPhone) =>{
+    let user = await db.User.findOne({ 
+        where: { 
+            phone:userPhone
+        } });
+    if (user) {
+        return true
+    }
+    return false    
+}
 const createUser = async (data) => {
     try {
-        
+         //check email, phone are existed
+    let isExistEmail = await checkEmailExist(data.email)
+    if (isExistEmail === true) {
+        return {
+            EM:'This email is already exist',
+            EC: 1
+        }
+    }
+
+    let isExistPhone = await checkPhoneExist(data.phone)
+    if (isExistPhone === true) {
+        return {
+            EM:'This phone number is already exist',
+            EC: 1
+        }
+    }
+    if (data.password < 4) {
+        return {
+            EM:'Password must be longer than 3 characters',
+            EC: 1
+        }
+    }
+    //hash password
+    let hashPassWord = hashUserPassWord(data.password)
+    //create newUser
+     await db.User.create({
+        email: data.email, 
+        password: hashPassWord, 
+        username: data.username,
+        phone: data.phone,
+        address: data.address,
+        sex: data.sex,
+        positionID: data.positionID
+    });
+
+    return{
+        EM:'User is created successfully',
+        EC: 0
+    }
     } catch (error) {
         console.log('Error: ',error)
         return{

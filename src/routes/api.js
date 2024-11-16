@@ -21,7 +21,7 @@ const router = express.Router();
     //api thêm sửa xóa người dùng
     router.get("/user/getAllUser", apiUserController.handleGetUser)
     router.delete("/user/delete",apiUserController.handleDeleteUser)
-
+    router.post("/user/create", apiUserController.handleCreateUser)
     
     //api lấy dữ liệu của position table
     router.get("/position/read", apiPositionController.readPosition)
