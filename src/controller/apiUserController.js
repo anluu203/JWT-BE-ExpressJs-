@@ -48,8 +48,22 @@ const handleCreateUser = async (req, res) =>{
         })
     } 
 }
-const handleUpdateUser = (req, res) =>{
+const handleUpdateUser = async (req, res) =>{
+    try{
+        let data = await apiUserService.updateUser(req.body)
+        return res.status(200).json({
+            EM: data.EM,
+            EC: data.EC,
+            DT: data.DT
+           })
 
+    } catch{
+        return res.status(500).json({
+           EM: 'Error from sever',
+           EC: '-1',
+           DT: ''
+        })
+    } 
 }
 
 const handleDeleteUser = async (req, res) =>{

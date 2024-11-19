@@ -40,7 +40,8 @@ const getUserWithPagination = async (page, results) =>{
             offset: offset,
             limit: results,
             attributes: ["id", "email", "username", "sex", "phone", "address"],
-            include:{model: db.position, attributes:["name","description"]}
+            include:{model: db.position, attributes:["name","description", "id"]},
+            order: [['id', 'DESC']]
           });
         
         let totalPages =  Math.ceil(count/results) 
@@ -62,7 +63,7 @@ const getUserWithPagination = async (page, results) =>{
     } catch (error) {
         console.log('Error: ',error)
         return{
-            EM: 'Something wrongs in service',
+            EM: 'Something wrongs in get service',
             EC: 1,
             DT: []
         }
@@ -142,7 +143,7 @@ const createUser = async (data) => {
     } catch (error) {
         console.log('Error: ',error)
         return{
-            EM: 'Something wrongs in service',
+            EM: 'Something wrongs in create service',
             EC: 1,
             DT: []
         }
@@ -153,23 +154,42 @@ const createUser = async (data) => {
 
 const updateUser = async (data) =>{
     try {
-        let user = await db.User.findOne({
-            where:{id: data.id}
-            
-        })
-        if (user) {
-               // update 
-            } else {
-                // not found
-            }
-    } catch (error) {
-        console.log('Error: ',error)
-        return{
-            EM: 'Something wrongs in service',
-            EC: 1,
-            DT: []
+        const user = await db.User.findOne({ where: { id: data.id } });
+    
+        if (!user) {
+            console.error('User not found with ID: ', data.id);
+            return {
+                EM: 'User not found',
+                EC: 1,
+                DT: null,
+            };
         }
+    
+        // Cập nhật user
+        await db.User.update(
+            {
+                username: data.username,
+                sex: data.sex,
+                address: data.address,
+                positionID: data.positionID,
+            },
+            { where: { id: data.id } }
+        );
+    
+        return {
+            EM: 'User updated successfully',
+            EC: 0,
+            DT: data,
+        };
+    } catch (error) {
+        console.error('Error in updateUser: ', error);
+        return {
+            EM: 'Something went wrong during update service',
+            EC: 1,
+            DT: null,
+        };
     }
+    
 }
 const deleteUser = async (id) =>{
     try {
@@ -195,7 +215,7 @@ const deleteUser = async (id) =>{
     } catch (error) {
         console.log('Error: ',error)
         return{
-            EM: 'Something wrongs in service',
+            EM: 'Something wrongs in delete service',
             EC: 1,
             DT: []
         }
