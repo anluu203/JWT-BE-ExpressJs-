@@ -1,8 +1,9 @@
+require("dotenv").config;
 const { Op } = require('sequelize');
 import bcrypt from 'bcrypt';
 import db from '../models/index'
-
-
+import {getPositionWithRole} from './JWTService'
+import { createJwt } from '../middleware/jwtActions';
 const salt = bcrypt.genSaltSync(10);
 const hashUserPassWord = (userPassWord) => {
     let hashPassWordCheck = bcrypt.hashSync(userPassWord, salt);
@@ -64,7 +65,8 @@ const RegisterNewUser = async (rawUserData) =>{
         email: rawUserData.email, 
         password: hashPassWord, 
         username: rawUserData.username,
-        phone: rawUserData.phone
+        phone: rawUserData.phone,
+        positionID: 2
     });
 
     return{
@@ -104,10 +106,22 @@ const CheckLogin = async (rawUserData) => {
         if (user) {
             let isCorrectPassword = checkPassword(rawUserData.valuePassword, user.password);
             if (isCorrectPassword) {
+
+
+               let positionWithRoles = await getPositionWithRole(user);
+               let payload = {
+                email: user.email,
+                positionWithRoles,
+                expiresIn: process.env.JWT_EXPIRES_IN
+               }
+                let token = createJwt(payload)
                 return {
                     EM: `Login successfully`,
                     EC: 0,
-                    DT: ''
+                    DT: {
+                        access_token: token,
+                        positionWithRoles
+                    }
                 };
             }
         }

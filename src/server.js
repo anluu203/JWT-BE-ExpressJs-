@@ -7,7 +7,6 @@ import bodyParser from "body-parser";
 import cors from 'cors'
 
 
-
 // import connection from "./config/connectDB";
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -33,6 +32,9 @@ app.use(bodyParser.urlencoded({extended: true}))
 
 //test connection
 // connection();
+
+
+
 
 //init web router
 initWebRouters(app)
