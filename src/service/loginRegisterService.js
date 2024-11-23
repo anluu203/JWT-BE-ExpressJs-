@@ -94,7 +94,6 @@ const CheckLogin = async (rawUserData) => {
         // Tìm kiếm người dùng theo email hoặc số điện thoại
         let user = await db.User.findOne({
             where: {
-                // email: rawUserData.valueLogin
                 [Op.or]: [
                     { email: rawUserData.valueLogin },
                     { phone: rawUserData.valueLogin }
@@ -106,7 +105,6 @@ const CheckLogin = async (rawUserData) => {
         if (user) {
             let isCorrectPassword = checkPassword(rawUserData.valuePassword, user.password);
             if (isCorrectPassword) {
-
 
                let positionWithRoles = await getPositionWithRole(user);
                let payload = {
@@ -125,8 +123,6 @@ const CheckLogin = async (rawUserData) => {
                 };
             }
         }
-
-        
         return {
             EM: 'Email/Phone number or password is incorrect',
             EC: 1,
