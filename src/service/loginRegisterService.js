@@ -4,6 +4,9 @@ import bcrypt from 'bcrypt';
 import db from '../models/index'
 import {getPositionWithRole} from './JWTService'
 import { createJwt } from '../middleware/jwtActions';
+
+
+
 const salt = bcrypt.genSaltSync(10);
 const hashUserPassWord = (userPassWord) => {
     let hashPassWordCheck = bcrypt.hashSync(userPassWord, salt);
@@ -105,12 +108,12 @@ const CheckLogin = async (rawUserData) => {
         if (user) {
             let isCorrectPassword = checkPassword(rawUserData.valuePassword, user.password);
             if (isCorrectPassword) {
-
                let positionWithRoles = await getPositionWithRole(user);
                let payload = {
                 email: user.email,
+                phone: user.phone,
                 positionWithRoles,
-                expiresIn: process.env.JWT_EXPIRES_IN
+                username: user.username
                }
                 let token = createJwt(payload)
                 return {
@@ -118,7 +121,9 @@ const CheckLogin = async (rawUserData) => {
                     EC: 0,
                     DT: {
                         access_token: token,
-                        positionWithRoles
+                        positionWithRoles,
+                        email: user.email,
+                        username: user.username
                     }
                 };
             }
